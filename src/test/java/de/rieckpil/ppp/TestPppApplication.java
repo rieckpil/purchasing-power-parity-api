@@ -11,7 +11,7 @@ import org.testcontainers.utility.DockerImageName;
 public class TestPppApplication {
 
   public static void main(String[] args) {
-    SpringApplication.from(PppApplication::main).with(TestPppApplication.class).run(args);
+    SpringApplication.from(Application::main).with(TestPppApplication.class).run(args);
   }
 
   @Bean
