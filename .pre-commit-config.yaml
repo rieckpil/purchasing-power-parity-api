@@ -14,4 +14,4 @@ repos:
     rev: v0.3.4
     hooks:
       - id: maven
-        args: ['-f pom.xml spotless:apply']
+        args: [ '-f pom.xml spotless:apply' ]
