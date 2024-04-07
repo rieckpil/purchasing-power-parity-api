@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: ppp-api
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres
+    password: ${SUPABASE_PPP_API_PASSWORD}
+    username: postgres.xdlzubousuiqlqbrggeb
+  jpa:
+    open-in-view: false
+  docker:
+    compose:
+      enabled: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health
+  endpoint:
+    flyway:
+      enabled: false
+server:
+  forward-headers-strategy: framework
