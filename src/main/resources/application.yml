@@ -23,5 +23,5 @@ server:
   forward-headers-strategy: framework
 app:
   open-exchange-rates-api-key: ${OPEN_EXCHANGE_RATES_API_KEY:notset}
-  open-exchange-rates-api-id: 41f27c348959403ab94a9741d30ca5eb
+  open-exchange-rates-api-id: ${OPEN_EXCHANGE_RATES_API_KEY:notset}
   quandl-api-key: ${QUANDL_API_KEY:notset}
