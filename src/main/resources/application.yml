@@ -21,3 +21,6 @@ management:
       enabled: false
 server:
   forward-headers-strategy: framework
+app:
+  open-exchange-rates-api-key: foo # to replace
+  quandl-api-key: bar # to replace
