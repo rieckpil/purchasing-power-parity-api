@@ -1,0 +1,39 @@
+name: Build & Deploy Project
+on:
+  push:
+  schedule:
+    - cron: '0 15 * * *' # daily at 3pm
+
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    timeout-minutes: 20
+    runs-on: ubuntu-22.04
+    name: Build Application
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup for JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          java-package: jdk
+          cache: maven
+
+      - name: Build with Maven
+        timeout-minutes: 15
+        continue-on-error: true
+        run: ./mvnw verify --no-transfer-progress
+
+      - name: Setup Flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
