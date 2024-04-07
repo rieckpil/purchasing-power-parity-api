@@ -13,6 +13,10 @@ kill_timeout = '5s'
 [env]
   MESSAGE = 'Hello from Fly!'
 
+[metrics]
+  port = 8080
+  path = "/actuator/prometheus"
+
 [http_service]
   internal_port = 8080
   force_https = true

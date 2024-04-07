@@ -15,17 +15,17 @@ management:
   endpoints:
     web:
       exposure:
-        include: info, health
+        include: info, health, prometheus
   endpoint:
     flyway:
       enabled: false
-  datadog:
+    prometheus:
+      enabled: true
+  prometheus:
     metrics:
       export:
-        api-key: ${DATADOG_API_KEY:notset}
-        application-key: ppp-api
-        enabled: false
         step: 1m
+        descriptions: false
 server:
   forward-headers-strategy: framework
 app:
