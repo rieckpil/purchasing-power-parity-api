@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Component
 public class OpenExchangeRatesClient {
@@ -17,7 +18,7 @@ public class OpenExchangeRatesClient {
     this.applicationProperties = applicationProperties;
   }
 
-  public Object fetchExchangeRates(Object pppInformation) {
+  public Mono<PurchasePowerParityResponsePayload> fetchExchangeRates(Object pppInformation) {
     return this.webClient
         .get()
         .uri("/latest.json?app_id={appId}", this.applicationProperties.getOpenExchangeRatesApiId())
@@ -26,7 +27,7 @@ public class OpenExchangeRatesClient {
         .map(response -> mapExchangeRatesToPppInformation(pppInformation, response));
   }
 
-  private Object mapExchangeRatesToPppInformation(
+  private PurchasePowerParityResponsePayload mapExchangeRatesToPppInformation(
       Object pppInformation, ExchangeRatesResponse response) {
     // Assuming that ExchangeRatesResponse contains a Map<String, Double> of currency codes to rates
     Map<String, Double> rates = response.getRates();
@@ -38,7 +39,7 @@ public class OpenExchangeRatesClient {
     // This is a placeholder implementation. You need to tailor it to your specific requirements.
     // pppInformation.setPppConversionFactor(exchangeRate); // Example usage
 
-    return pppInformation;
+    return new PurchasePowerParityResponsePayload();
   }
 
   public static class ExchangeRatesResponse {

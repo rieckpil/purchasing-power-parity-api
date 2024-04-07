@@ -7,4 +7,8 @@ public record PurchasePowerParityResponsePayload(
     String countryCodeIsoAlpha3,
     Map<String, Object> currenciesCountry,
     Double ppp,
-    Double pppConversionFactor) {}
+    Double pppConversionFactor) {
+  public PurchasePowerParityResponsePayload() {
+    this(null, null, null, null, null);
+  }
+}

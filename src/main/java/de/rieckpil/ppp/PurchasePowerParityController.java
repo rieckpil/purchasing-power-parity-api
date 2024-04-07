@@ -1,13 +1,12 @@
 package de.rieckpil.ppp;
 
-import java.util.Optional;
-
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/")
@@ -19,12 +18,11 @@ public class PurchasePowerParityController {
   }
 
   @GetMapping
-  public ResponseEntity<PurchasePowerParityResponsePayload> getPpp(
-      @RequestParam(value = "target", required = false) @NotEmpty String countryCode) {
+  public Mono<ResponseEntity<PurchasePowerParityResponsePayload>> getPpp(
+      @RequestParam(value = "target", required = false) @NotEmpty String countryCodeIsoAlpha2) {
     return purchasePowerParityService
-        .getByCountryCode(countryCode)
+        .getByCountryCodeIsoAlpha2(countryCodeIsoAlpha2)
         .map(ResponseEntity::ok)
-        .or(() -> Optional.of(ResponseEntity.notFound().build()))
-        .get();
+        .defaultIfEmpty(ResponseEntity.notFound().build());
   }
 }
