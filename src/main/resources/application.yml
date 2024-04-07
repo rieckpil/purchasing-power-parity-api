@@ -19,6 +19,13 @@ management:
   endpoint:
     flyway:
       enabled: false
+  datadog:
+    metrics:
+      export:
+        api-key: ${DATADOG_API_KEY:notset}
+        application-key: ppp-api
+        enabled: false
+        step: 1m
 server:
   forward-headers-strategy: framework
 app:
