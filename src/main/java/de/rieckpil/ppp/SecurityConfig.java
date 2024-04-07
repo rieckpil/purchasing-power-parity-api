@@ -18,7 +18,7 @@ public class SecurityConfig {
         .httpBasic(Customizer.withDefaults())
         .sessionManagement(
             sessionManagement ->
-                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
+                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     return http.build();
   }
