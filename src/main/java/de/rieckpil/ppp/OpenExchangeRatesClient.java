@@ -20,8 +20,7 @@ public class OpenExchangeRatesClient {
   public Object fetchExchangeRates(Object pppInformation) {
     return this.webClient
         .get()
-        .uri(
-            "/latest.json?app_id={apiKey}", this.applicationProperties.getOpenExchangeRatesApiKey())
+        .uri("/latest.json?app_id={appId}", this.applicationProperties.getOpenExchangeRatesApiId())
         .retrieve()
         .bodyToMono(ExchangeRatesResponse.class)
         .map(response -> mapExchangeRatesToPppInformation(pppInformation, response));

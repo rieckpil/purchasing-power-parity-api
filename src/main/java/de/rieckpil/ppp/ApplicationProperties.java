@@ -8,12 +8,18 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "app")
 public class ApplicationProperties {
   @NotEmpty private final String quandlApiKey;
-
   @NotEmpty private final String openExchangeRatesApiKey;
+  @NotEmpty private final String openExchangeRatesApiId;
 
-  public ApplicationProperties(String quandlApiKey, String openExchangeRatesApiKey) {
+  public ApplicationProperties(
+      String quandlApiKey, String openExchangeRatesApiKey, String openExchangeRatesApiId) {
     this.quandlApiKey = quandlApiKey;
     this.openExchangeRatesApiKey = openExchangeRatesApiKey;
+    this.openExchangeRatesApiId = openExchangeRatesApiId;
+  }
+
+  public String getOpenExchangeRatesApiId() {
+    return openExchangeRatesApiId;
   }
 
   public String getQuandlApiKey() {

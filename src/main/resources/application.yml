@@ -22,5 +22,6 @@ management:
 server:
   forward-headers-strategy: framework
 app:
-  open-exchange-rates-api-key: foo # to replace
-  quandl-api-key: bar # to replace
+  open-exchange-rates-api-key: ${OPEN_EXCHANGE_RATES_API_KEY:notset}
+  open-exchange-rates-api-id: 41f27c348959403ab94a9741d30ca5eb
+  quandl-api-key: ${QUANDL_API_KEY:notset}
