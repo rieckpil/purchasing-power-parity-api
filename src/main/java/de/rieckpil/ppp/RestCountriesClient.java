@@ -8,17 +8,27 @@ import reactor.core.publisher.Mono;
 public class RestCountriesClient {
 
   private final WebClient restCountriesWebClient;
+  private final CountryMapper countryMapper;
 
-  public RestCountriesClient(WebClient restCountriesWebClient) {
+  public RestCountriesClient(WebClient restCountriesWebClient, CountryMapper countryMapper) {
     this.restCountriesWebClient = restCountriesWebClient;
+    this.countryMapper = countryMapper;
   }
 
-  // iso3
   public Mono<String> fetchCountryMeta(String countryCodeIsoAlpha2) {
-    return this.restCountriesWebClient
-        .get()
-        .uri("/alpha/{countryCode}", countryCodeIsoAlpha2)
-        .retrieve()
-        .bodyToMono(String.class);
+    return countryMapper
+        .getIsoCodeIsoAlpha3(countryCodeIsoAlpha2)
+        .orElse(
+            this.restCountriesWebClient
+                .get()
+                .uri("/alpha/{countryCode}", countryCodeIsoAlpha2)
+                .retrieve()
+                .onStatus(
+                    status -> status.is4xxClientError() || status.is5xxServerError(),
+                    clientResponse ->
+                        Mono.error(new RuntimeException("Error fetching country meta - not found")))
+                .bodyToMono(String.class)
+                .retry(3)
+                .onErrorResume(e -> Mono.empty()));
   }
 }

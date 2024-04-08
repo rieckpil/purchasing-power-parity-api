@@ -11,4 +11,13 @@ public record PurchasePowerParityResponsePayload(
   public PurchasePowerParityResponsePayload() {
     this(null, null, null, null, null);
   }
+
+  public PurchasePowerParityResponsePayload(PurchasePowerParityResponsePayload input) {
+    this(
+        input.countryCodeIsoAlpha2(),
+        input.countryCodeIsoAlpha3(),
+        input.currenciesCountry(),
+        input.ppp(),
+        input.pppConversionFactor());
+  }
 }

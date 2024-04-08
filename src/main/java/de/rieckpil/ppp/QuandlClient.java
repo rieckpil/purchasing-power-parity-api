@@ -1,5 +1,6 @@
 package de.rieckpil.ppp;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -15,20 +16,19 @@ public class QuandlClient {
     this.applicationProperties = applicationProperties;
   }
 
-  public Mono<Object> fetchPurchasePowerParity(String countryCodeIsoAlpha3) {
+  public Mono<JsonNode> fetchPurchasePowerParity(String countryCodeIsoAlpha3) {
     return this.quandlWebClient
         .get()
         .uri(
             uriBuilder ->
                 uriBuilder
                     .path("/datasets/ODA/{countryCodeIsoAlpha3}_PPPEX.json")
-                    .queryParam(
-                        "start_date",
-                        "2023-01-01") // You might want to adjust the dates dynamically
+                    .queryParam("start_date", "2023-01-01")
                     .queryParam("end_date", "2023-12-31")
                     .queryParam("api_key", this.applicationProperties.getQuandlApiKey())
                     .build(countryCodeIsoAlpha3))
         .retrieve()
-        .bodyToMono(Object.class);
+        .bodyToMono(JsonNode.class)
+        .retry(3);
   }
 }

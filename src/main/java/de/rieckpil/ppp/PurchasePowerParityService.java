@@ -1,7 +1,5 @@
 package de.rieckpil.ppp;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,17 +25,19 @@ public class PurchasePowerParityService {
 
   public Mono<PurchasePowerParityResponsePayload> getByCountryCodeIsoAlpha2(
       String countryCodeIsoAlpha2) {
-    PurchasePowerParityResponsePayload pppInformation = new PurchasePowerParityResponsePayload();
 
-    if (countryCodeIsoAlpha2.equals("DE")) {
-      return Mono.justOrEmpty(
-          new PurchasePowerParityResponsePayload("DE", "DEU", Map.of("EUR", "Germany"), 1.0, 1.0));
+    String countryIsoAlpha3 = restCountriesClient.fetchCountryMeta(countryCodeIsoAlpha2).block();
+
+    if (countryIsoAlpha3 == null) {
+      return Mono.empty();
     }
 
-    return restCountriesClient
-        .fetchCountryMeta(countryCodeIsoAlpha2)
-        .flatMap(quandlClient::fetchPurchasePowerParity)
-        .flatMap(openExchangeRatesClient::fetchExchangeRates)
+    return quandlClient
+        .fetchPurchasePowerParity(countryIsoAlpha3)
+        .flatMap(
+            body -> {
+              return openExchangeRatesClient.fetchExchangeRates(body);
+            })
         .onErrorResume(
             e -> {
               LOG.error(String.format("Error fetching PPP information: %s", e.getMessage()), e);
