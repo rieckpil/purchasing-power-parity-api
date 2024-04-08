@@ -26,6 +26,7 @@ public class Application implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
-    LOG.info("Up- and running with profile(s): {}", String.join(",", environment.getActiveProfiles()));
+    LOG.info(
+        "Up- and running with profile(s): {}", String.join(",", environment.getActiveProfiles()));
   }
 }
