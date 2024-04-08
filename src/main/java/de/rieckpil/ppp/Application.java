@@ -1,5 +1,7 @@
 package de.rieckpil.ppp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,6 +11,8 @@ import org.springframework.core.env.Environment;
 @SpringBootApplication
 @EnableConfigurationProperties({ApplicationProperties.class})
 public class Application implements CommandLineRunner {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Application.class);
 
   private final Environment environment;
 
@@ -22,8 +26,6 @@ public class Application implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
-    System.out.println(environment.getProperty("SUPABASE_PPP_API_PASSWORD"));
-    System.out.println(environment.getProperty("OPEN_EXCHANGE_RATES_API_KEY"));
-    System.out.println(environment.getProperty("QUANDL_API_KEY"));
+    LOG.info("Up- and running with profile(s): {}", String.join(",", environment.getActiveProfiles()));
   }
 }
