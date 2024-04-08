@@ -21,7 +21,7 @@ public class RestCountriesClient {
         .orElse(
             this.restCountriesWebClient
                 .get()
-                .uri("/alpha/{countryCode}", countryCodeIsoAlpha2)
+                .uri("/v3.1/alpha/{countryCode}", countryCodeIsoAlpha2)
                 .retrieve()
                 .onStatus(
                     status -> status.is4xxClientError() || status.is5xxServerError(),

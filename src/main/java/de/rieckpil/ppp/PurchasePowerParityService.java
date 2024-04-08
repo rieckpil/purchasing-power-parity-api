@@ -11,15 +11,15 @@ public class PurchasePowerParityService {
   private static final Logger LOG = LoggerFactory.getLogger(PurchasePowerParityService.class);
 
   private final RestCountriesClient restCountriesClient;
-  private final QuandlClient quandlClient;
+  private final NasdaqClient nasdaqClient;
   private final OpenExchangeRatesClient openExchangeRatesClient;
 
   public PurchasePowerParityService(
       RestCountriesClient restCountriesClient,
-      QuandlClient quandlClient,
+      NasdaqClient nasdaqClient,
       OpenExchangeRatesClient openExchangeRatesClient) {
     this.restCountriesClient = restCountriesClient;
-    this.quandlClient = quandlClient;
+    this.nasdaqClient = nasdaqClient;
     this.openExchangeRatesClient = openExchangeRatesClient;
   }
 
@@ -32,7 +32,7 @@ public class PurchasePowerParityService {
       return Mono.empty();
     }
 
-    return quandlClient
+    return nasdaqClient
         .fetchPurchasePowerParity(countryIsoAlpha3)
         .flatMap(
             body -> {

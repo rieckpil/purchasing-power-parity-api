@@ -9,16 +9,16 @@ public class WebClientConfig {
 
   @Bean
   public WebClient openExchangeRatesWebClient(WebClient.Builder webClientBuilder) {
-    return webClientBuilder.baseUrl("https://openexchangerates.org/api").build();
+    return webClientBuilder.baseUrl("https://openexchangerates.org").build();
   }
 
   @Bean
-  public WebClient quandlWebClient(WebClient.Builder webClientBuilder) {
-    return webClientBuilder.baseUrl("https://www.quandl.com/api").build();
+  public WebClient nasdaqWebClient(WebClient.Builder webClientBuilder) {
+    return webClientBuilder.baseUrl("https://data.nasdaq.com").build();
   }
 
   @Bean
   public WebClient restCountriesWebClient(WebClient.Builder webClientBuilder) {
-    return webClientBuilder.baseUrl("https://restcountries.com/api").build();
+    return webClientBuilder.baseUrl("https://restcountries.com").build();
   }
 }
