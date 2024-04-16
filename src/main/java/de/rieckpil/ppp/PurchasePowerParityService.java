@@ -26,18 +26,13 @@ public class PurchasePowerParityService {
   public Mono<PurchasePowerParityResponsePayload> getByCountryCodeIsoAlpha2(
       String countryCodeIsoAlpha2) {
 
-    String countryIsoAlpha3 = restCountriesClient.fetchCountryMeta(countryCodeIsoAlpha2).block();
-
-    if (countryIsoAlpha3 == null) {
-      return Mono.empty();
-    }
-
-    return nasdaqClient
-        .fetchPurchasePowerParity(countryIsoAlpha3)
+    return restCountriesClient
+        .fetchCountryMeta(countryCodeIsoAlpha2)
+        .map(nasdaqClient::fetchPurchasePowerParity)
+        .flatMap(ppp -> ppp)
         .flatMap(
-            body -> {
-              return openExchangeRatesClient.fetchExchangeRates(body);
-            })
+            ppp -> openExchangeRatesClient.fetchExchangeRates(countryCodeIsoAlpha2, "DEU", ppp))
+        .switchIfEmpty(Mono.empty())
         .onErrorResume(
             e -> {
               LOG.error(String.format("Error fetching PPP information: %s", e.getMessage()), e);

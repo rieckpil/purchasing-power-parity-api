@@ -1,7 +1,9 @@
 package de.rieckpil.ppp;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -18,7 +20,8 @@ public class OpenExchangeRatesClient {
     this.applicationProperties = applicationProperties;
   }
 
-  public Mono<PurchasePowerParityResponsePayload> fetchExchangeRates(Object pppInformation) {
+  public Mono<PurchasePowerParityResponsePayload> fetchExchangeRates(
+      String countryCodeIsoAlpha2, String countryCodeIsoAlpha3, JsonNode pppInformation) {
     return this.webClient
         .get()
         .uri(
@@ -26,33 +29,34 @@ public class OpenExchangeRatesClient {
             this.applicationProperties.getOpenExchangeRatesApiId())
         .retrieve()
         .bodyToMono(ExchangeRatesResponse.class)
-        .map(response -> mapExchangeRatesToPppInformation(pppInformation, response));
+        .map(this::mapRates)
+        .map(
+            exchangeRates ->
+                mapExchangeRatesToPpp(
+                    exchangeRates, pppInformation, countryCodeIsoAlpha2, countryCodeIsoAlpha3));
   }
 
-  private PurchasePowerParityResponsePayload mapExchangeRatesToPppInformation(
-      Object pppInformation, ExchangeRatesResponse response) {
-    // Assuming that ExchangeRatesResponse contains a Map<String, Double> of currency codes to rates
-    Map<String, Double> rates = response.getRates();
-    Double exchangeRate =
-        rates.getOrDefault(
-            "USD", 1.0); // Assuming USD as default; adjust based on your requirements.
+  public PurchasePowerParityResponsePayload mapExchangeRatesToPpp(
+      Map<String, Double> exchangeRates,
+      JsonNode pppInformation,
+      String countryCodeIsoAlpha2,
+      String countryCodeIsoAlpha3) {
+    Map<String, Object> currenciesCountry = Map.of("DUE", exchangeRates.getOrDefault("DEU", 1.0));
+    Double ppp = 1.0;
+    Double pppConversionFactor = 1.0;
 
-    // Here, you might want to adjust how you integrate the exchange rate into your PppInformation.
-    // This is a placeholder implementation. You need to tailor it to your specific requirements.
-    // pppInformation.setPppConversionFactor(exchangeRate); // Example usage
-
-    return new PurchasePowerParityResponsePayload();
+    return new PurchasePowerParityResponsePayload(
+        countryCodeIsoAlpha2, countryCodeIsoAlpha3, currenciesCountry, ppp, pppConversionFactor);
   }
 
-  public static class ExchangeRatesResponse {
-    private Map<String, Double> rates;
-
-    public Map<String, Double> getRates() {
-      return rates;
+  public Map<String, Double> mapRates(ExchangeRatesResponse response) {
+    Map<String, Double> exchangeRates = new HashMap<>();
+    for (String key : response.rates.keySet()) {
+      exchangeRates.put(key, response.rates.get(key));
     }
 
-    public void setRates(Map<String, Double> rates) {
-      this.rates = rates;
-    }
+    return exchangeRates;
   }
+
+  public record ExchangeRatesResponse(Map<String, Double> rates) {}
 }
