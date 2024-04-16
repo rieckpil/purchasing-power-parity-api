@@ -21,7 +21,9 @@ public class OpenExchangeRatesClient {
   public Mono<PurchasePowerParityResponsePayload> fetchExchangeRates(Object pppInformation) {
     return this.webClient
         .get()
-        .uri("/api/latest.json?app_id={appId}", this.applicationProperties.getOpenExchangeRatesApiId())
+        .uri(
+            "/api/latest.json?app_id={appId}",
+            this.applicationProperties.getOpenExchangeRatesApiId())
         .retrieve()
         .bodyToMono(ExchangeRatesResponse.class)
         .map(response -> mapExchangeRatesToPppInformation(pppInformation, response));
