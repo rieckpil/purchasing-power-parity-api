@@ -3,6 +3,7 @@ package de.rieckpil.ppp;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -11,14 +12,21 @@ import reactor.core.publisher.Mono;
 public class NasdaqClient {
 
   private final WebClient webClient;
+  private final ObjectMapper objectMapper;
   private final ApplicationProperties applicationProperties;
 
-  public NasdaqClient(WebClient nasdaqWebClient, ApplicationProperties applicationProperties) {
+  public NasdaqClient(
+      WebClient nasdaqWebClient,
+      ObjectMapper objectMapper,
+      ApplicationProperties applicationProperties) {
     this.webClient = nasdaqWebClient;
+    this.objectMapper = objectMapper;
     this.applicationProperties = applicationProperties;
   }
 
-  public Mono<JsonNode> fetchPurchasePowerParity(String countryCodeIsoAlpha3) {
+  public Mono<NasdaqResponse> fetchPurchasePowerParity(CountryMeta countryMeta) {
+    var countryCodeIsoAlpha3 = countryMeta.countryCodeIsoAlpha3();
+
     return this.webClient
         .get()
         .uri(
@@ -31,6 +39,10 @@ public class NasdaqClient {
                     .build(countryCodeIsoAlpha3))
         .retrieve()
         .bodyToMono(JsonNode.class)
+        .map(jsonNode -> this.objectMapper.convertValue(jsonNode, NasdaqResponse.class))
+        .map(
+            nasdaqResponse ->
+                new NasdaqResponse(countryMeta, nasdaqResponse.meta(), nasdaqResponse.datatable()))
         .retry(3);
   }
 }

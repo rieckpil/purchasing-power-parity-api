@@ -30,8 +30,7 @@ public class PurchasePowerParityService {
         .fetchCountryMeta(countryCodeIsoAlpha2)
         .map(nasdaqClient::fetchPurchasePowerParity)
         .flatMap(ppp -> ppp)
-        .flatMap(
-            ppp -> openExchangeRatesClient.fetchExchangeRates(countryCodeIsoAlpha2, "DEU", ppp))
+        .flatMap(ppp -> openExchangeRatesClient.fetchExchangeRates(countryCodeIsoAlpha2, ppp))
         .switchIfEmpty(Mono.empty())
         .onErrorResume(
             e -> {

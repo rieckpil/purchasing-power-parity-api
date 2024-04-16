@@ -6,14 +6,8 @@ public record PurchasePowerParityResponsePayload(
     String countryCodeIsoAlpha2,
     String countryCodeIsoAlpha3,
     Map<String, Object> currenciesCountry,
+    CurrencyMain currencyMain,
     Double ppp,
-    Double pppConversionFactor) {
-  public PurchasePowerParityResponsePayload(PurchasePowerParityResponsePayload input) {
-    this(
-        input.countryCodeIsoAlpha2(),
-        input.countryCodeIsoAlpha3(),
-        input.currenciesCountry(),
-        input.ppp(),
-        input.pppConversionFactor());
-  }
-}
+    Double pppConversionFactor) {}
+
+record CurrencyMain(Double exchangeRate, String name, String symbol) {}

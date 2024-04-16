@@ -1,9 +1,10 @@
 package de.rieckpil.ppp;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -21,7 +22,7 @@ public class OpenExchangeRatesClient {
   }
 
   public Mono<PurchasePowerParityResponsePayload> fetchExchangeRates(
-      String countryCodeIsoAlpha2, String countryCodeIsoAlpha3, JsonNode pppInformation) {
+      String countryCodeIsoAlpha2, NasdaqResponse pppInformation) {
     return this.webClient
         .get()
         .uri(
@@ -30,23 +31,34 @@ public class OpenExchangeRatesClient {
         .retrieve()
         .bodyToMono(ExchangeRatesResponse.class)
         .map(this::mapRates)
-        .map(
-            exchangeRates ->
-                mapExchangeRatesToPpp(
-                    exchangeRates, pppInformation, countryCodeIsoAlpha2, countryCodeIsoAlpha3));
+        .map(exchangeRates -> mapExchangeRatesToPpp(exchangeRates, pppInformation));
   }
 
   public PurchasePowerParityResponsePayload mapExchangeRatesToPpp(
-      Map<String, Double> exchangeRates,
-      JsonNode pppInformation,
-      String countryCodeIsoAlpha2,
-      String countryCodeIsoAlpha3) {
-    Map<String, Object> currenciesCountry = Map.of("DUE", exchangeRates.getOrDefault("DEU", 1.0));
-    Double ppp = 1.0;
-    Double pppConversionFactor = 1.0;
+      Map<String, Double> exchangeRates, NasdaqResponse pppInformation) {
+
+    String countryCodeIsoAlpha2 = pppInformation.countryMeta().countryCodeIsoAlpha2();
+    String countryCodeIsoAlpha3 = pppInformation.countryMeta().countryCodeIsoAlpha3();
+
+    String currencyCode = pppInformation.countryMeta().currencyCode();
+    String currencySymbol = pppInformation.countryMeta().currencySymbol();
+    String currencyName = pppInformation.countryMeta().currencyName();
+
+    Double exchangeRate = exchangeRates.getOrDefault(currencyCode, 1.0);
+    Map<String, Object> currenciesCountry =
+        Map.of(currencyCode, Map.of("name", currencyName, "symbol", currencySymbol));
+    Double pppRaw = (Double) pppInformation.datatable().data().get(0).get(2);
+    Double pppPercentage =
+        BigDecimal.valueOf(pppRaw * 100).setScale(2, RoundingMode.HALF_UP).doubleValue();
+    Double pppConversionFactor = pppRaw / exchangeRate;
 
     return new PurchasePowerParityResponsePayload(
-        countryCodeIsoAlpha2, countryCodeIsoAlpha3, currenciesCountry, ppp, pppConversionFactor);
+        countryCodeIsoAlpha2,
+        countryCodeIsoAlpha3,
+        currenciesCountry,
+        new CurrencyMain(exchangeRate, "USD", "$"),
+        pppPercentage,
+        pppConversionFactor);
   }
 
   public Map<String, Double> mapRates(ExchangeRatesResponse response) {
