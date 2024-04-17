@@ -1,13 +1,20 @@
 package de.rieckpil.ppp;
 
+import java.math.BigDecimal;
+import java.util.Map;
+
 import de.rieckpil.ppp.db.postgresql.tables.records.CountryMetaRecord;
+import de.rieckpil.ppp.db.postgresql.tables.records.ExchangeRatesRecord;
+import de.rieckpil.ppp.db.postgresql.tables.records.PppRecord;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import static de.rieckpil.ppp.db.postgresql.Tables.EXCHANGE_RATES;
 import static de.rieckpil.ppp.db.postgresql.tables.CountryMeta.COUNTRY_META;
+import static de.rieckpil.ppp.db.postgresql.tables.Ppp.PPP;
 
 @Service
 public class PurchasePowerParityService {
@@ -33,10 +40,19 @@ public class PurchasePowerParityService {
   public Mono<PurchasePowerParityResponsePayload> getByCountryCodeIsoAlpha2(
       String countryCodeIsoAlpha2) {
 
-    return getCountryMeta(countryCodeIsoAlpha2)
-        .map(nasdaqClient::fetchPurchasePowerParity)
-        .flatMap(ppp -> ppp)
-        .flatMap(openExchangeRatesClient::fetchExchangeRates)
+    return maybeFetchCountryMeta(countryCodeIsoAlpha2)
+        .map(this::maybeFetchPurchasePowerParity)
+        .flatMap(record -> record)
+        .flatMap(this::maybeFetchExchangeRates)
+        .map(
+            exchangeRate ->
+                new PurchasePowerParityResponsePayload(
+                    exchangeRate.getCountryCodeIsoAlpha2(),
+                    exchangeRate.getCountryCodeIsoAlpha3(),
+                    Map.of(),
+                    new CurrencyMain(323.2, "", ""),
+                    45.3,
+                    3.2))
         .switchIfEmpty(Mono.empty())
         .onErrorResume(
             e -> {
@@ -45,7 +61,58 @@ public class PurchasePowerParityService {
             });
   }
 
-  private Mono<CountryMetaRecord> getCountryMeta(String countryCodeIsoAlpha2) {
+  private Mono<ExchangeRatesRecord> maybeFetchExchangeRates(PppRecord pppRecord) {
+    return Mono.from(
+            dslContext
+                .selectFrom(EXCHANGE_RATES)
+                .where(
+                    EXCHANGE_RATES.COUNTRY_CODE_ISO_ALPHA3.eq(pppRecord.getCountryCodeIsoAlpha3())))
+        .switchIfEmpty(
+            openExchangeRatesClient
+                .fetchExchangeRates(pppRecord)
+                .flatMap(
+                    fetchedExchangeRate -> {
+                      var record = dslContext.newRecord(EXCHANGE_RATES);
+                      record.setExchangeRate(fetchedExchangeRate);
+                      record.setCurrencyName(pppRecord.getCurrencyName());
+                      record.setCurrencySymbol(pppRecord.getCurrencySymbol());
+                      record.setCurrencyCode(pppRecord.getCurrencyCode());
+                      record.setCountryCodeIsoAlpha2(pppRecord.getCountryCodeIsoAlpha2());
+                      record.setCountryCodeIsoAlpha3(pppRecord.getCountryCodeIsoAlpha3());
+                      return Mono.from(
+                          dslContext.insertInto(EXCHANGE_RATES).set(record).returning());
+                    }));
+  }
+
+  private Mono<PppRecord> maybeFetchPurchasePowerParity(CountryMetaRecord countryMetaRecord) {
+    return Mono.from(
+            dslContext
+                .selectFrom(PPP)
+                .where(PPP.COUNTRY_CODE_ISO_ALPHA3.eq(countryMetaRecord.getCountryCodeIsoAlpha3())))
+        .switchIfEmpty(
+            this.nasdaqClient
+                .fetchPurchasePowerParity(countryMetaRecord)
+                .map(
+                    nasdaqResponse -> {
+                      var record = dslContext.newRecord(PPP);
+                      record.setCountryCodeIsoAlpha2(
+                          nasdaqResponse.countryMetaResponse().countryCodeIsoAlpha2());
+                      record.setCountryCodeIsoAlpha3(
+                          nasdaqResponse.countryMetaResponse().countryCodeIsoAlpha3());
+                      record.setCurrencyCode(nasdaqResponse.countryMetaResponse().currencyCode());
+                      record.setCurrencySymbol(
+                          nasdaqResponse.countryMetaResponse().currencySymbol());
+                      record.setCurrencyName(nasdaqResponse.countryMetaResponse().currencyName());
+                      record.setPpp(
+                          BigDecimal.valueOf(
+                              (double) nasdaqResponse.datatable().data().get(0).get(2)));
+                      return record;
+                    })
+                .map(pppRecord -> Mono.from(dslContext.insertInto(PPP).set(pppRecord).returning()))
+                .flatMap(record -> record));
+  }
+
+  private Mono<CountryMetaRecord> maybeFetchCountryMeta(String countryCodeIsoAlpha2) {
     return Mono.from(
             dslContext
                 .selectFrom(COUNTRY_META)
