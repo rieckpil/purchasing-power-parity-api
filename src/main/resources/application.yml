@@ -1,16 +1,24 @@
 spring:
-  application:
-    name: ppp-api
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres
+  r2dbc:
+    url: r2dbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres
     password: ${SUPABASE_PPP_API_PASSWORD}
     username: postgres.xdlzubousuiqlqbrggeb
-  jpa:
-    open-in-view: false
+  jooq:
+    sql-dialect: postgres
+  application:
+    name: ppp-api
   docker:
     compose:
       enabled: false
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  security:
+    user:
+      password: changeme
+  flyway:
+    url: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres
+    user: ${spring.r2dbc.username}
+    password: ${spring.r2dbc.password}
 management:
   endpoints:
     web:
@@ -18,7 +26,7 @@ management:
         include: info, health, prometheus
   endpoint:
     flyway:
-      enabled: false
+      enabled: true
     prometheus:
       enabled: true
   prometheus:

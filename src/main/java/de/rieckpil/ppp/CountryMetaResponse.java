@@ -1,6 +1,6 @@
 package de.rieckpil.ppp;
 
-public record CountryMeta(
+public record CountryMetaResponse(
     String countryCodeIsoAlpha2,
     String countryCodeIsoAlpha3,
     String currencyCode,

@@ -24,8 +24,8 @@ public class NasdaqClient {
     this.applicationProperties = applicationProperties;
   }
 
-  public Mono<NasdaqResponse> fetchPurchasePowerParity(CountryMeta countryMeta) {
-    var countryCodeIsoAlpha3 = countryMeta.countryCodeIsoAlpha3();
+  public Mono<NasdaqResponse> fetchPurchasePowerParity(CountryMetaResponse countryMetaResponse) {
+    var countryCodeIsoAlpha3 = countryMetaResponse.countryCodeIsoAlpha3();
 
     return this.webClient
         .get()
@@ -42,7 +42,8 @@ public class NasdaqClient {
         .map(jsonNode -> this.objectMapper.convertValue(jsonNode, NasdaqResponse.class))
         .map(
             nasdaqResponse ->
-                new NasdaqResponse(countryMeta, nasdaqResponse.meta(), nasdaqResponse.datatable()))
+                new NasdaqResponse(
+                    countryMetaResponse, nasdaqResponse.meta(), nasdaqResponse.datatable()))
         .retry(3);
   }
 }

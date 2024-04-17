@@ -21,7 +21,7 @@ public class RestCountriesClient {
     this.objectMapper = objectMapper;
   }
 
-  public Mono<CountryMeta> fetchCountryMeta(String countryCodeIsoAlpha2) {
+  public Mono<CountryMetaResponse> fetchCountryMeta(String countryCodeIsoAlpha2) {
     return this.restCountriesWebClient
         .get()
         .uri("/v3.1/alpha/{countryCode}", countryCodeIsoAlpha2)
@@ -37,7 +37,7 @@ public class RestCountriesClient {
                   objectMapper.convertValue(
                       jsonNode.get(0).get("currencies"),
                       new TypeReference<Map<String, Currency>>() {});
-              return new CountryMeta(
+              return new CountryMetaResponse(
                   countryCodeIsoAlpha2,
                   jsonNode.get(0).get("cca3").asText(),
                   currencies.keySet().stream().findFirst().get(),

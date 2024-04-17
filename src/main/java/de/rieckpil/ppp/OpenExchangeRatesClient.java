@@ -37,12 +37,12 @@ public class OpenExchangeRatesClient {
   public PurchasePowerParityResponsePayload mapExchangeRatesToPpp(
       Map<String, Double> exchangeRates, NasdaqResponse pppInformation) {
 
-    String countryCodeIsoAlpha2 = pppInformation.countryMeta().countryCodeIsoAlpha2();
-    String countryCodeIsoAlpha3 = pppInformation.countryMeta().countryCodeIsoAlpha3();
+    String countryCodeIsoAlpha2 = pppInformation.countryMetaResponse().countryCodeIsoAlpha2();
+    String countryCodeIsoAlpha3 = pppInformation.countryMetaResponse().countryCodeIsoAlpha3();
 
-    String currencyCode = pppInformation.countryMeta().currencyCode();
-    String currencySymbol = pppInformation.countryMeta().currencySymbol();
-    String currencyName = pppInformation.countryMeta().currencyName();
+    String currencyCode = pppInformation.countryMetaResponse().currencyCode();
+    String currencySymbol = pppInformation.countryMetaResponse().currencySymbol();
+    String currencyName = pppInformation.countryMetaResponse().currencyName();
 
     Double exchangeRate = exchangeRates.getOrDefault(currencyCode, 1.0);
     Map<String, Object> currenciesCountry =
