@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -183,44 +184,55 @@
       </plugin>
 
       <plugin>
-        <groupId>org.jooq</groupId>
-        <artifactId>jooq-codegen-maven</artifactId>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-jooq-codegen-maven-plugin</artifactId>
+        <version>0.0.3</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
-            <id>generate-postgresql</id>
+            <id>generate-jooq-sources</id>
             <goals>
               <goal>generate</goal>
             </goals>
             <phase>generate-sources</phase>
             <configuration>
-              <jdbc>
-                <driver>org.postgresql.Driver</driver>
-                <url>jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres</url>
-                <user>postgres.xdlzubousuiqlqbrggeb</user>
-                <password>${SUPABASE_PPP_API_PASSWORD}</password>
-              </jdbc>
-              <generator>
-                <database>
-                  <inputSchema>public</inputSchema>
-                  <includes>.*</includes>
-                  <excludes></excludes>
-                </database>
-                <generate>
-                  <deprecated>false</deprecated>
-                  <instanceFields>true</instanceFields>
-                  <pojos>true</pojos>
-                </generate>
-                <target>
-                  <packageName>de.rieckpil.ppp.db.postgresql</packageName>
-                  <directory>target/generated-sources/jooq-postgresql</directory>
-                </target>
-              </generator>
+              <database>
+                <type>POSTGRES</type>
+                <containerImage>postgres:15.1-alpine</containerImage>
+              </database>
+              <flyway>
+                <locations>
+                  filesystem:src/main/resources/db/migration
+                </locations>
+              </flyway>
+              <jooq>
+                <generator>
+                  <database>
+                    <includes>.*</includes>
+                    <excludes>flyway_schema_history</excludes>
+                    <inputSchema>public</inputSchema>
+                  </database>
+                  <target>
+                    <packageName>de.rieckpil.ppp.db.postgresql</packageName>
+                    <directory>target/generated-sources/jooq-postgresql</directory>
+                  </target>
+                </generator>
+              </jooq>
             </configuration>
           </execution>
         </executions>
-
       </plugin>
     </plugins>
   </build>
-
 </project>
