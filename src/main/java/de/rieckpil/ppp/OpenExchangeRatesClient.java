@@ -22,7 +22,7 @@ public class OpenExchangeRatesClient {
   }
 
   public Mono<PurchasePowerParityResponsePayload> fetchExchangeRates(
-      String countryCodeIsoAlpha2, NasdaqResponse pppInformation) {
+      NasdaqResponse pppInformation) {
     return this.webClient
         .get()
         .uri(

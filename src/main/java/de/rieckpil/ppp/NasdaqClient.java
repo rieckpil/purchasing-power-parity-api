@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.rieckpil.ppp.db.postgresql.tables.records.CountryMetaRecord;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -24,8 +25,8 @@ public class NasdaqClient {
     this.applicationProperties = applicationProperties;
   }
 
-  public Mono<NasdaqResponse> fetchPurchasePowerParity(CountryMetaResponse countryMetaResponse) {
-    var countryCodeIsoAlpha3 = countryMetaResponse.countryCodeIsoAlpha3();
+  public Mono<NasdaqResponse> fetchPurchasePowerParity(CountryMetaRecord countryMetaRecord) {
+    var countryCodeIsoAlpha3 = countryMetaRecord.getCountryCodeIsoAlpha3();
 
     return this.webClient
         .get()
@@ -43,7 +44,14 @@ public class NasdaqClient {
         .map(
             nasdaqResponse ->
                 new NasdaqResponse(
-                    countryMetaResponse, nasdaqResponse.meta(), nasdaqResponse.datatable()))
+                    new CountryMetaResponse(
+                        countryMetaRecord.getCountryCodeIsoAlpha2(),
+                        countryMetaRecord.getCountryCodeIsoAlpha3(),
+                        countryMetaRecord.getCurrencyCode(),
+                        countryMetaRecord.getCurrencySymbol(),
+                        countryMetaRecord.getCurrencyName()),
+                    nasdaqResponse.meta(),
+                    nasdaqResponse.datatable()))
         .retry(3);
   }
 }

@@ -10,3 +10,10 @@ record DataTable(List<List<Object>> data, List<Column> columns) {}
 record Column(String name, String type) {}
 
 record Meta(String nextCursorId) {}
+
+record CountryMetaResponse(
+    String countryCodeIsoAlpha2,
+    String countryCodeIsoAlpha3,
+    String currencyCode,
+    String currencySymbol,
+    String currencyName) {}
