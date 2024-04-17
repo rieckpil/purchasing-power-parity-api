@@ -3,6 +3,8 @@ spring:
     url: r2dbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres
     password: ${SUPABASE_PPP_API_PASSWORD}
     username: postgres.xdlzubousuiqlqbrggeb
+    pool:
+      enabled: false
   jooq:
     sql-dialect: postgres
   application:

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -18,7 +19,7 @@ class ApplicationIT {
 
   @Autowired private WebTestClient webTestClient;
 
-  @Container
+  @Container @ServiceConnection
   static PostgreSQLContainer<?> postgresContainer =
       new PostgreSQLContainer<>(DockerImageName.parse("postgres:15.1-alpine"));
 
@@ -29,6 +30,7 @@ class ApplicationIT {
     dynamicPropertyRegistry.add("spring.r2dbc.username", () -> postgresContainer.getUsername());
     dynamicPropertyRegistry.add("spring.r2dbc.password", () -> postgresContainer.getPassword());
     dynamicPropertyRegistry.add("spring.flyway.url", () -> postgresContainer.getJdbcUrl());
+    dynamicPropertyRegistry.add("spring.flyway.enabled", () -> false);
   }
 
   @Test
