@@ -1,10 +1,10 @@
 package de.rieckpil.ppp;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 
 import de.rieckpil.ppp.db.postgresql.tables.records.CountryMetaRecord;
-import de.rieckpil.ppp.db.postgresql.tables.records.ExchangeRatesRecord;
 import de.rieckpil.ppp.db.postgresql.tables.records.PppRecord;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
@@ -42,17 +42,32 @@ public class PurchasePowerParityService {
 
     return maybeFetchCountryMeta(countryCodeIsoAlpha2)
         .map(this::maybeFetchPurchasePowerParity)
-        .flatMap(record -> record)
+        .flatMap(mono -> mono)
         .flatMap(this::maybeFetchExchangeRates)
         .map(
             exchangeRate ->
                 new PurchasePowerParityResponsePayload(
-                    exchangeRate.getCountryCodeIsoAlpha2(),
-                    exchangeRate.getCountryCodeIsoAlpha3(),
-                    Map.of(),
-                    new CurrencyMain(323.2, "", ""),
-                    45.3,
-                    3.2))
+                    exchangeRate.pppRecord().getCountryCodeIsoAlpha2(),
+                    exchangeRate.pppRecord().getCountryCodeIsoAlpha3(),
+                    Map.of(
+                        exchangeRate.pppRecord().getCurrencyCode(),
+                        Map.of(
+                            "name",
+                            exchangeRate.pppRecord().getCurrencyName(),
+                            "symbol",
+                            exchangeRate.pppRecord().getCurrencySymbol())),
+                    new CurrencyMain(exchangeRate.exchangeRate().doubleValue(), "USD", "$"),
+                    exchangeRate
+                        .pppRecord()
+                        .getPpp()
+                        .multiply(BigDecimal.valueOf(100))
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .doubleValue(),
+                    exchangeRate
+                        .pppRecord()
+                        .getPpp()
+                        .divide(exchangeRate.exchangeRate(), 2, RoundingMode.HALF_UP)
+                        .doubleValue()))
         .switchIfEmpty(Mono.empty())
         .onErrorResume(
             e -> {
@@ -61,19 +76,23 @@ public class PurchasePowerParityService {
             });
   }
 
-  private Mono<ExchangeRatesRecord> maybeFetchExchangeRates(PppRecord pppRecord) {
+  private Mono<OpenExchangeRatesClient.ExchangeRateResult> maybeFetchExchangeRates(
+      PppRecord pppRecord) {
     return Mono.from(
             dslContext
                 .selectFrom(EXCHANGE_RATES)
                 .where(
                     EXCHANGE_RATES.COUNTRY_CODE_ISO_ALPHA3.eq(pppRecord.getCountryCodeIsoAlpha3())))
+        .map(
+            record ->
+                new OpenExchangeRatesClient.ExchangeRateResult(pppRecord, record.getExchangeRate()))
         .switchIfEmpty(
             openExchangeRatesClient
                 .fetchExchangeRates(pppRecord)
                 .flatMap(
-                    fetchedExchangeRate -> {
+                    exchangeRateResult -> {
                       var record = dslContext.newRecord(EXCHANGE_RATES);
-                      record.setExchangeRate(fetchedExchangeRate);
+                      record.setExchangeRate(exchangeRateResult.exchangeRate());
                       record.setCurrencyName(pppRecord.getCurrencyName());
                       record.setCurrencySymbol(pppRecord.getCurrencySymbol());
                       record.setCurrencyCode(pppRecord.getCurrencyCode());
@@ -81,7 +100,11 @@ public class PurchasePowerParityService {
                       record.setCountryCodeIsoAlpha3(pppRecord.getCountryCodeIsoAlpha3());
                       return Mono.from(
                           dslContext.insertInto(EXCHANGE_RATES).set(record).returning());
-                    }));
+                    })
+                .map(
+                    record ->
+                        new OpenExchangeRatesClient.ExchangeRateResult(
+                            pppRecord, record.getExchangeRate())));
   }
 
   private Mono<PppRecord> maybeFetchPurchasePowerParity(CountryMetaRecord countryMetaRecord) {

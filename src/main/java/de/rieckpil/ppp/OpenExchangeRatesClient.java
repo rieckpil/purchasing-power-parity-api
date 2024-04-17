@@ -20,7 +20,7 @@ public class OpenExchangeRatesClient {
     this.applicationProperties = applicationProperties;
   }
 
-  public Mono<BigDecimal> fetchExchangeRates(PppRecord pppRecord) {
+  public Mono<ExchangeRateResult> fetchExchangeRates(PppRecord pppRecord) {
     return this.webClient
         .get()
         .uri(
@@ -30,9 +30,13 @@ public class OpenExchangeRatesClient {
         .bodyToMono(ExchangeRatesResponse.class)
         .map(
             exchangeRates ->
-                BigDecimal.valueOf(
-                    exchangeRates.rates().getOrDefault(pppRecord.getCurrencyCode(), 1.0)));
+                new ExchangeRateResult(
+                    pppRecord,
+                    BigDecimal.valueOf(
+                        exchangeRates.rates().getOrDefault(pppRecord.getCurrencyCode(), 1.0))));
   }
 
   public record ExchangeRatesResponse(Map<String, Double> rates) {}
+
+  public record ExchangeRateResult(PppRecord pppRecord, BigDecimal exchangeRate) {}
 }
