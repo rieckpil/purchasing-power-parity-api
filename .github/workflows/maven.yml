@@ -28,7 +28,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install pack CLI
-        uses: buildpacks/github-actions/setup-pack@v4.8.1
+        uses: buildpacks/github-actions/setup-pack@v5.5.4
 
       - name: Build & publish app
 #        env:
