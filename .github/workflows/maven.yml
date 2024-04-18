@@ -30,6 +30,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup Testcontainers Cloud client
+        uses: atomicjar/testcontainers-cloud-setup-action@v1
+        with:
+          token: ${{ secrets.TC_CLOUD_TOKEN }}
+          logfile: testcontainers-client.log
+
       - name: Install pack CLI
         uses: buildpacks/github-actions/setup-pack@v5.5.4
 
