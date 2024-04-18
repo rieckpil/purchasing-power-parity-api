@@ -12,6 +12,8 @@ jobs:
   build-and-test:
     timeout-minutes: 20
     runs-on: ubuntu-22.04
+    container:
+      options: --privileged
     permissions:
       packages: write
       contents: read
@@ -32,18 +34,12 @@ jobs:
 
       - name: Build & publish app
         run: |
-          echo "$DOCKER_HOST"
-#          pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
-#              --builder paketobuildpacks/builder-jammy-base \
-#              --path . \
-#              --env "BP_OCI_SOURCE=https://github.com/rieckpil/purchasing-power-parity-api" \
-#              --env "BP_JVM_VERSION=21" \
-#              --publish
-
-#      - name: Build with Maven
-#        timeout-minutes: 15
-#        continue-on-error: true
-#        run: ./mvnw verify --no-transfer-progress
+          pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
+              --builder paketobuildpacks/builder-jammy-base \
+              --path . \
+              --env "BP_OCI_SOURCE=https://github.com/rieckpil/purchasing-power-parity-api" \
+              --env "BP_JVM_VERSION=21" \
+              --publish
 
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
