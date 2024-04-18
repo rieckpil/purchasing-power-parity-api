@@ -34,6 +34,7 @@ jobs:
 #        env:
 #          DOCKER_HOST: unix:///run/docker/docker.sock
         run: |
+          echo $DOCKER_HOST
           pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
               --builder paketobuildpacks/builder-jammy-base \
               --path . \
