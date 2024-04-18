@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-22.04
     container:
-      image: ubuntu:22.04
+      image: myoung34/github-runner:ubuntu-jammy
       options: --privileged
     permissions:
       packages: write
