@@ -31,16 +31,14 @@ jobs:
         uses: buildpacks/github-actions/setup-pack@v5.5.4
 
       - name: Build & publish app
-#        env:
-#          DOCKER_HOST: unix:///run/docker/docker.sock
         run: |
           echo $DOCKER_HOST
-          pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
-              --builder paketobuildpacks/builder-jammy-base \
-              --path . \
-              --env "BP_OCI_SOURCE=https://github.com/rieckpil/purchasing-power-parity-api" \
-              --env "BP_JVM_VERSION=21" \
-              --publish
+#          pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
+#              --builder paketobuildpacks/builder-jammy-base \
+#              --path . \
+#              --env "BP_OCI_SOURCE=https://github.com/rieckpil/purchasing-power-parity-api" \
+#              --env "BP_JVM_VERSION=21" \
+#              --publish
 
 #      - name: Build with Maven
 #        timeout-minutes: 15
