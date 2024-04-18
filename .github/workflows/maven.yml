@@ -32,7 +32,7 @@ jobs:
 
       - name: Build & publish app
         run: |
-          echo $DOCKER_HOST
+          echo "$DOCKER_HOST"
 #          pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
 #              --builder paketobuildpacks/builder-jammy-base \
 #              --path . \
