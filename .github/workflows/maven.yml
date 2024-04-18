@@ -13,9 +13,6 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-22.04
     container:
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.github_token }}
       image: ubuntu:22.04
       options: --privileged
     permissions:
