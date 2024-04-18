@@ -1,4 +1,4 @@
-name: Build & Deploy Project
+name: Deploy Application
 on:
   push:
   schedule:
