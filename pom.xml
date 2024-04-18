@@ -199,6 +199,11 @@
             <version>${testcontainers.version}</version>
           </dependency>
           <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>r2dbc</artifactId>
+            <version>${testcontainers.version}</version>
+          </dependency>
+          <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
@@ -212,6 +217,7 @@
             </goals>
             <phase>generate-sources</phase>
             <configuration>
+              <skip>${jooq.codegen.skip}</skip>
               <database>
                 <type>POSTGRES</type>
                 <containerImage>postgres:15.1-alpine</containerImage>
