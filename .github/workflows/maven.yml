@@ -31,6 +31,8 @@ jobs:
         uses: buildpacks/github-actions/setup-pack@v4.8.1
 
       - name: Build & publish app
+        env:
+          DOCKER_HOST: unix:///run/docker/docker.sock
         run: |
           pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
               --builder paketobuildpacks/builder-jammy-base \
