@@ -59,7 +59,7 @@ jobs:
           pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
               --builder paketobuildpacks/builder-jammy-base \
               --path . \
-              --env "MAVEN_OPTS=-Xms256m -Xmx512m -Djooq.codegen.skip=true" \
+              --env "MAVEN_OPTS=-Xms256m -Xmx512m" \
               --env "BP_LOG_LEVEL=DEBUG" \
               --env "BP_OCI_SOURCE=https://github.com/rieckpil/purchasing-power-parity-api" \
               --env "BP_JVM_VERSION=21" \
