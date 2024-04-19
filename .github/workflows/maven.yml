@@ -50,6 +50,12 @@ jobs:
       - name: Build & publish app
         run: |
           ./mvnw compile
+
+          docker volume create tc-config-volume
+
+          docker run --rm \
+            --volume tc-config-volume:/home/runner/.testcontainers.properties:ro alpine
+
           pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
               --builder paketobuildpacks/builder-jammy-base \
               --path . \
@@ -57,6 +63,7 @@ jobs:
               --env "BP_LOG_LEVEL=DEBUG" \
               --env "BP_OCI_SOURCE=https://github.com/rieckpil/purchasing-power-parity-api" \
               --env "BP_JVM_VERSION=21" \
+              --volume tc-config-volume:/home/runner/.testcontainers.properties:ro \
               --publish
 
       - name: Setup Flyctl
