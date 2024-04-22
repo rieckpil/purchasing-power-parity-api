@@ -44,11 +44,10 @@ jobs:
               --builder paketobuildpacks/builder-jammy-base \
               --path . \
               --env "MAVEN_OPTS=-Xms256m -Xmx512m" \
+              --env "SUPABASE_PPP_API_PASSWORD" \
               --env "BP_LOG_LEVEL=DEBUG" \
               --env "BP_OCI_SOURCE=https://github.com/rieckpil/purchasing-power-parity-api" \
               --env "BP_JVM_VERSION=21" \
-              --network=host \
-              --docker-host=inherit \
               --publish
 
       - name: Setup Flyctl
