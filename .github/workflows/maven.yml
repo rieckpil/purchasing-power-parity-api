@@ -37,6 +37,7 @@ jobs:
           pack build ghcr.io/rieckpil/purchasing-power-parity-api:${{ github.run_id }} \
               --builder paketobuildpacks/builder-jammy-base \
               --path . \
+              --env "MAVEN_OPTS=-Dorg.jooq.no-logo=true -Dorg.jooq.no-tips=true" \
               --env "SUPABASE_PPP_API_PASSWORD" \
               --env "BP_OCI_SOURCE=https://github.com/rieckpil/purchasing-power-parity-api" \
               --env "BP_JVM_VERSION=21" \
