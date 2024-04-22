@@ -42,7 +42,7 @@ jobs:
         env:
           SUPABASE_PPP_API_PASSWORD: ${{ secrets.SUPABASE_PPP_API_PASSWORD }}
         run: |
-          pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
+          pack build ghcr.io/rieckpil/purchasing-power-parity-api:${{ github.run_id }} \
               --builder paketobuildpacks/builder-jammy-base \
               --path . \
               --env "SUPABASE_PPP_API_PASSWORD" \
@@ -54,6 +54,6 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly
-        run: flyctl deploy --image ghcr.io/rieckpil/purchasing-power-parity-api:latest
+        run: flyctl deploy --image ghcr.io/rieckpil/purchasing-power-parity-api:${{ github.run_id }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
