@@ -30,11 +30,15 @@ jobs:
       - name: Install pack CLI
         uses: buildpacks/github-actions/setup-pack@v5.5.4
 
+      - name: Set Now
+        run: echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
       - name: Build & publish app
         env:
           SUPABASE_PPP_API_PASSWORD: ${{ secrets.SUPABASE_PPP_API_PASSWORD }}
+          RELEASE_TAG: "${{ env.NOW }}-${{ github.run_id }}"
         run: |
-          pack build ghcr.io/rieckpil/purchasing-power-parity-api:${{ github.run_id }} \
+          pack build ghcr.io/rieckpil/purchasing-power-parity-api:${{ env.RELEASE_TAG }} \
               --builder paketobuildpacks/builder-jammy-base \
               --path . \
               --env "MAVEN_OPTS=-Dorg.jooq.no-logo=true -Dorg.jooq.no-tips=true" \
@@ -47,6 +51,7 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly
-        run: flyctl deploy --image ghcr.io/rieckpil/purchasing-power-parity-api:${{ github.run_id }}
+        run: flyctl deploy --image ghcr.io/rieckpil/purchasing-power-parity-api:${{ env.RELEASE_TAG }}
         env:
+          RELEASE_TAG: "${{ env.NOW }}-${{ github.run_id }}"
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
