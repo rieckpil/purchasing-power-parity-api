@@ -56,6 +56,6 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly
-        run: flyctl deploy --image ghcr.io/rieckpil/rieckpil/purchasing-power-parity-api:latest
+        run: flyctl deploy --image ghcr.io/rieckpil/purchasing-power-parity-api:latest
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
