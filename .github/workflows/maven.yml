@@ -43,14 +43,12 @@ jobs:
           SUPABASE_PPP_API_PASSWORD: ${{ secrets.SUPABASE_PPP_API_PASSWORD }}
         run: |
           pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
-           --path . \
-           --builder paketobuildpacks/builder:tiny \
-           --buildpack gcr.io/paketo-buildpacks/java-native-image:latest \
-           --env "SUPABASE_PPP_API_PASSWORD" \
-           --env "BP_NATIVE_IMAGE=true" \
-           --env "BP_OCI_SOURCE=https://github.com/rieckpil/purchasing-power-parity-api:native" \
-           --env "BP_JVM_VERSION=21" \
-           --publish
+              --builder paketobuildpacks/builder-jammy-base \
+              --path . \
+              --env "SUPABASE_PPP_API_PASSWORD" \
+              --env "BP_OCI_SOURCE=https://github.com/rieckpil/purchasing-power-parity-api" \
+              --env "BP_JVM_VERSION=21" \
+              --publish
 
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master

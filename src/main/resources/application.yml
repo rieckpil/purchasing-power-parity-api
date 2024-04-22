@@ -21,6 +21,8 @@ spring:
     url: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres
     user: ${spring.r2dbc.username}
     password: ${spring.r2dbc.password}
+  main:
+    banner-mode: off
 management:
   endpoints:
     web:
