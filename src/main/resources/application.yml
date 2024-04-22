@@ -40,6 +40,9 @@ management:
         descriptions: false
 server:
   forward-headers-strategy: framework
+  error:
+    whitelabel:
+      enabled: false
 app:
   open-exchange-rates-api-key: ${OPEN_EXCHANGE_RATES_API_KEY:notset}
   open-exchange-rates-api-id: ${OPEN_EXCHANGE_RATES_API_KEY:notset}
