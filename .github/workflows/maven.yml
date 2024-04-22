@@ -12,9 +12,6 @@ jobs:
   build-and-test:
     timeout-minutes: 10
     runs-on: ubuntu-22.04
-#    container:
-#      image: myoung34/github-runner:ubuntu-jammy
-#      options: --privileged
     permissions:
       packages: write
       contents: read
@@ -30,12 +27,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Testcontainers Cloud client
-        uses: atomicjar/testcontainers-cloud-setup-action@v1
-        with:
-          token: ${{ secrets.TC_CLOUD_TOKEN }}
-          logfile: testcontainers-client.log
-
       - name: Install pack CLI
         uses: buildpacks/github-actions/setup-pack@v5.5.4
 
@@ -49,13 +40,6 @@ jobs:
 
       - name: Build & publish app
         run: |
-          ./mvnw compile
-
-          docker volume create tc-config-volume
-
-          docker run --rm \
-            --volume tc-config-volume:/home/runner/.testcontainers.properties:ro alpine
-
           pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
               --builder paketobuildpacks/builder-jammy-base \
               --path . \
@@ -63,7 +47,7 @@ jobs:
               --env "BP_LOG_LEVEL=DEBUG" \
               --env "BP_OCI_SOURCE=https://github.com/rieckpil/purchasing-power-parity-api" \
               --env "BP_JVM_VERSION=21" \
-              --volume tc-config-volume:/home/runner/.testcontainers.properties:ro \
+              --docker-host inherit \
               --publish
 
       - name: Setup Flyctl
