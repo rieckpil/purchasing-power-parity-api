@@ -30,6 +30,8 @@ public class Application implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
+    System.setProperty("org.jooq.no-logo", "true");
+    System.setProperty("org.jooq.no-tips", "true");
     LOG.info(
         "Up- and running with profile(s): {}", String.join(",", environment.getActiveProfiles()));
   }
