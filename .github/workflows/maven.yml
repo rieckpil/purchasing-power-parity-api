@@ -39,6 +39,8 @@ jobs:
           cache: maven
 
       - name: Build & publish app
+        env:
+          SUPABASE_PPP_API_PASSWORD: ${{ secrets.SUPABASE_PPP_API_PASSWORD }}
         run: |
           pack build ghcr.io/rieckpil/purchasing-power-parity-api:latest \
               --builder paketobuildpacks/builder-jammy-base \
