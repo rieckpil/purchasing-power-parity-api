@@ -2,17 +2,12 @@ package de.rieckpil.ppp;
 
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-@CrossOrigin(
-    value = {"*"},
-    allowedHeaders = {"*"},
-    maxAge = 900)
 @RestController
 @RequestMapping("/")
 public class PurchasePowerParityController {
