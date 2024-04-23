@@ -29,3 +29,9 @@ kill_timeout = '5s'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
+
+# https://community.fly.io/t/edge-headers/9278
+[services.ports.http_options.response.headers]
+Access-Control-Allow-Origin = "*"
+Access-Control-Allow-Methods = "*"
+Access-Control-Allow-Headers = "*"
