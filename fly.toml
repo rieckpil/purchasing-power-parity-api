@@ -30,8 +30,21 @@ kill_timeout = '5s'
   cpu_kind = 'shared'
   cpus = 1
 
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
 # https://community.fly.io/t/edge-headers/9278
-[services.ports.http_options.response.headers]
-Access-Control-Allow-Origin = "*"
-Access-Control-Allow-Methods = "*"
-Access-Control-Allow-Headers = "*"
+  [services.ports.http_options.response.headers]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "*"
+    Access-Control-Allow-Headers = "*"
