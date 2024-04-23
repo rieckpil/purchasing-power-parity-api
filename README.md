@@ -2,13 +2,19 @@
 
 Successor backend for the [Purchasing Power Parity API](https://github.com/rwieruch/purchasing-power-parity) from [Robin Wieruch](https://github.com/rwieruch).
 
+Exchange rates and purchase power parity is fetched once per day for each country and then cached for the rest of the day.
+
 ## Access the API
 
-- `https://ppp-api.fly.dev/?target=<COUNTRY_CODE_ISO_3166_ALPHA_2>`, e.g. `https://ppp-api.fly.dev/?target=DE`
 
-Response:
+- [Swagger UI](https://ppp-api.fly.dev/swagger-doc/swagger-ui.html)
+- [API docs](https://ppp-api.fly.dev/swagger-doc/v3/api-docs)
 
-```json
+Sample:
+
+```shell
+$ curl -v https://ppp-api.fly.dev/?target=DE
+
 {
   "countryCodeIsoAlpha2": "DE",
   "countryCodeIsoAlpha3": "DEU",
