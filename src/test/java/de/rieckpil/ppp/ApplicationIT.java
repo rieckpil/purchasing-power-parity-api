@@ -21,7 +21,7 @@ class ApplicationIT {
 
   @Container @ServiceConnection
   static PostgreSQLContainer<?> postgresContainer =
-      new PostgreSQLContainer<>(DockerImageName.parse("postgres:15.1-alpine"));
+      new PostgreSQLContainer<>(DockerImageName.parse("postgres:16.3-alpine"));
 
   @DynamicPropertySource
   static void configure(DynamicPropertyRegistry dynamicPropertyRegistry) {
