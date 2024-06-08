@@ -28,7 +28,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install pack CLI
-        uses: buildpacks/github-actions/setup-pack@v5.5.4
+        uses: buildpacks/github-actions/setup-pack@v5.7.2
 
       - name: Set Now
         run: echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
